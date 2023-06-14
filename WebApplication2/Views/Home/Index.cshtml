@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "QR";
+}
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <h1>QR Code Scanner</h1>
+            <div id="reader" style="width: 600px"></div>
+            <div id="qr-reader-results" class="card-panel"></div>
+            <button id="scan-again-btn" class="btn">Scan Again</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/raw.githubusercontent.com_mebjas_html5-qrcode_master_minified_html5-qrcode.min.js"></script>
+    <script>
+
+        function docReady(fn) {
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener("DOMContentLoaded", fn);
+            }
+        }
+
+        docReady(function () {
+            var resultContainer = document.getElementById('qr-reader-results');
+            var lastResult, countResults = 0;
+            var scanAgainBtn = document.getElementById('scan-again-btn');
+
+            function onScanSuccess(decodedText, decodedResult) {
+                if (decodedText !== lastResult) {
+                    ++countResults;
+                    lastResult = decodedText;
+                    console.log(`Scan result ${decodedText}`, decodedResult);
+                    resultContainer.textContent = `Scan result: ${decodedText}`;
+
+                    // Stop scanning and turn off the camera
+                    html5QrcodeScanner.clear();
+                    scanAgainBtn.style.display = 'block';
+                }
+            }
+
+            var html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+
+            function startScanning() {
+                scanAgainBtn.style.display = 'none';
+                html5QrcodeScanner.render(onScanSuccess);
+            }
+
+
+
+            scanAgainBtn.addEventListener('click', startScanning);
+            startScanning();
+        });
+
+    </script>
+    }
+
